@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+    <meta charset="UTF-8">
+    <title>משחק מילות יחס</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f8ff;
+            direction: rtl;
+        }
+        
+        #gameContainer {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        #welcomeScreen {
+            margin: 20px;
+        }
+        
+        #gameScreen {
+            display: none;
+        }
+        
+        #sentence {
+            font-size: 24px;
+            margin: 20px;
+            padding: 20px;
+            border: 2px solid #007bff;
+            border-radius: 10px;
+        }
+        
+        .preposition-circle {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            margin: 10px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 50%;
+            line-height: 50px;
+            cursor: pointer;
+            animation: rotate 10s infinite linear;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg) translateX(50px) rotate(0deg); }
+            to { transform: rotate(360deg) translateX(50px) rotate(-360deg); }
+        }
+        
+        #feedback {
+            font-size: 24px;
+            margin: 20px;
+        }
+        
+        #startButton {
+            font-size: 20px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        #nameInput {
+            font-size: 18px;
+            padding: 8px;
+            margin: 10px;
+            direction: rtl;
+        }
+        
+        .trophy {
+            display: none;
+            max-width: 200px;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="welcomeScreen">
+            <h1>ברוכים הבאים למשחק מילות יחס</h1>
+            <input type="text" id="nameInput" placeholder="הכנס את שמך">
+            <br>
+            <button id="startButton">התחלה</button>
+        </div>
+        
+        <div id="gameScreen">
+            <div id="sentence"></div>
+            <div id="prepositions">
+                <span class="preposition-circle">ב</span>
+                <span class="preposition-circle">ל</span>
+                <span class="preposition-circle">מ</span>
+                <span class="preposition-circle">עם</span>
+                <span class="preposition-circle">את</span>
+            </div>
+            <div id="feedback"></div>
+            <img src="pitcher.png" class="trophy" id="trophy">
+            <audio id="successSound" src="sound.mp3"></audio>
+        </div>
+    </div>
+
+    <script>
+        const sentences = [
+            {text: "הוא תמיד משתמש ___ ספר שלו בשיעור", answer: "ב"},
+            {text: "הם טסים ___ חו״ל כל שנה", answer: "ל"},
+            {text: "אנחנו יוצאים ___ הכיתה להפסקה בשעה 10", answer: "מ"},
+            {text: "אני מדברת ___ ההורים כל ערב", answer: "עם"},
+            {text: "הוא לא זוכר ___ המילים החדשות", answer: "את"}
+        ];
+
+        let currentSentence = 0;
+        let playerName = "";
+        
+        document.getElementById('startButton').addEventListener('click', () => {
+            playerName = document.getElementById('nameInput').value;
+            if (!playerName) {
+                alert("אנא הכנס את שמך");
+                return;
+            }
+            document.getElementById('welcomeScreen').style.display = 'none';
+            document.getElementById('gameScreen').style.display = 'block';
+            showSentence();
+        });
+
+        function showSentence() {
+            if (currentSentence >= sentences.length) {
+                endGame();
+                return;
+            }
+            document.getElementById('sentence').textContent = sentences[currentSentence].text;
+            document.getElementById('feedback').textContent = '';
+        }
+
+        function endGame() {
+            document.getElementById('sentence').textContent = `כל הכבוד ${playerName}! סיימת את המשחק!`;
+            document.getElementById('prepositions').style.display = 'none';
+            document.getElementById('trophy').style.display = 'block';
+            document.getElementById('successSound').play();
+        }
+
+        document.querySelectorAll('.preposition-circle').forEach(circle => {
+            circle.addEventListener('click', () => {
+                const selectedPreposition = circle.textContent;
+                const correctPreposition = sentences[currentSentence].answer;
+                
+                if (selectedPreposition === correctPreposition) {
+                    document.getElementById('feedback').innerHTML = '😊 כל הכבוד לך!';
+                    document.getElementById('successSound').play();
+                    setTimeout(() => {
+                        currentSentence++;
+                        showSentence();
+                    }, 1500);
+                } else {
+                    document.getElementById('feedback').innerHTML = '😢 נסה שוב';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
